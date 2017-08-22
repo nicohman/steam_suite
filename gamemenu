@@ -1,0 +1,5 @@
+#!/bin/bash
+~/scripts/gamelist > /tmp/gamelist
+res=$(rofi -p "> " -dmenu < /tmp/gamelist)
+cd ~/Games/$res
+./start

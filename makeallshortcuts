@@ -1,0 +1,10 @@
+#!/bin/bash
+
+IFS='
+'
+array=( `ls  --format=single-column ~/.local/share/Steam/steamapps/common | tr -d /` )
+
+for element in "${array[@]}"
+do
+    bash ./createsteamshortcut $element
+done

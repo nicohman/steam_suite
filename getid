@@ -1,0 +1,2 @@
+#!/bin/bash
+cat ~/.local/share/Steam/steamapps/appmanifest_$1.acf | grep 'dir' |tr -d '\n\r\t\v' | cut -c 14-

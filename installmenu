@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+var getGames = require('./getGames.js');
+var http = require('http');
+var spawn = require('child_process');
+var getGamePlatform = require('./platformGames.js')
+var sem = require('semaphore')(1)
+var fs = require('fs')
+var info = require("./config.json");
+var key = info.key;
+var steamid = info.steamid
+getGames(steamid,key, 0, function(games){
+  games = games.response.games;
+  const ids = spawn.exec('bash ./listInstalled', function(err, out, stderr){
+    var ids = out.split("\n");
+    sem.take(function(){
+      var i = 0;
+      var num = games.length
+    games.forEach(function(game, index){
+      if(game != undefined){
+      ids.forEach(function(id){
+        id = id.trim()
+        if(game.appid == id){
+          delete games[index]
+        }
+
+      })
+      if(i >= num){
+        sem.leave();
+      } else {
+        i++;
+      }
+    }
+    })
+    sem.leave();
+  });
+    sem.take(function(){
+      var i = 0;
+      var num = games.length
+      games.forEach(function(game, index){
+      if(game != undefined){
+        getGamePlatform(game.appid, function(platforms){
+          if(platforms.linux != true){
+            delete games[index]
+            if(i >= num){
+              sem.leave();
+            }else {
+              i++;
+            }
+          }
+        })
+      }
+    })
+    sem.leave();
+  });
+  sem.take(function(){
+    var names = '';
+    games.forEach(function(game){
+      if(game != undefined){
+        var toAdd = game.name + "\n"
+        toAdd =  toAdd.toLowerCase().replace(/: /g, "_").replace("-", "_").replace(/ /g, "_").replace(",", "").replace("™", "");
+        names += toAdd;
+      }
+      fs.open('/tmp/installlist', 'w', function(err, fd){
+        fs.writeFile(fd, names, function(err){
+          const rofi = spawn.exec('rofi -p "> " -dmenu < /tmp/installlist', function(err, out, stderr){
+            games.forEach(function(game){
+              if(game.name == out.trim() ){
+                console.log("Picked "+game.name);
+                const steam = spawn.exec('steam "steam://rungameid/'+game.appid+'"', function(err, out, stderr){
+
+                })
+              }
+            })
+          })
+        })
+      })
+    })
+    sem.leave()
+    })
+  });
+});

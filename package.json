@@ -1,0 +1,19 @@
+{
+  "name": "steam_suite",
+  "version": "1.0.0",
+  "description": "Set of tools to make using steam better",
+  "dependencies": {
+    "semaphore": "^1.1.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicohman/steam_suite.git"
+  },
+  "author": "Nico Hickman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicohman/steam_suite/issues"
+  },
+  "homepage": "https://github.com/nicohman/steam_suite#readme"
+}
