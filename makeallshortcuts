@@ -3,8 +3,8 @@
 IFS='
 '
 array=( `ls  --format=single-column ~/.local/share/Steam/steamapps/common | tr -d /` )
-
+cd ~/steam_suite
 for element in "${array[@]}"
 do
-    bash ./createsteamshortcut $element
+    bash ./createsteamshortcut $element $1
 done

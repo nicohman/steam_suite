@@ -1,15 +1,15 @@
 #!/bin/bash
 name=$(node ./geturl $1| head -n 1)
 url=$(node ./geturl $1 | tail -n 1)
-if [ -f ./$name/start ]
+if [ -f $2/$name/start ]
 then
     echo "Shortcut for $name already made!"
     exit 0
 else
     echo "Making shortcut for $name"
 fi
-mkdir "$name"
-cd "$name"
+mkdir $2/"$name"
+cd $2/"$name"
 touch ./start
 chmod +x ./start
 echo "#!/bin/bash" > ./start

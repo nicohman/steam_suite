@@ -1,16 +1,16 @@
 #!/usr/bin/env node
-var getGames = require('./getGames.js');
+var getGames = require(__dirname + '/getGames.js');
 var http = require('http');
 var spawn = require('child_process');
-var getGamePlatform = require('./platformGames.js')
+var getGamePlatform = require(__dirname + '/platformGames.js')
 var sem = require('semaphore')(1)
 var fs = require('fs')
-var info = require("./config.json");
+var info = require(__dirname +"/config.json");
 var key = info.key;
 var steamid = info.steamid
 getGames(steamid,key, 0, function(games){
   games = games.response.games;
-  const ids = spawn.exec('bash ./listInstalled', function(err, out, stderr){
+  spawn.exec('bash ./listInstalled', function(err, out, stderr){
     var ids = out.split("\n");
     sem.take(function(){
       var i = 0;
@@ -62,11 +62,11 @@ getGames(steamid,key, 0, function(games){
       }
       fs.open('/tmp/installlist', 'w', function(err, fd){
         fs.writeFile(fd, names, function(err){
-          const rofi = spawn.exec('rofi -p "> " -dmenu < /tmp/installlist', function(err, out, stderr){
+          spawn.exec('rofi -p "> " -dmenu < /tmp/installlist', function(err, out, stderr){
             games.forEach(function(game){
               if(game.name == out.trim() ){
                 console.log("Picked "+game.name);
-                const steam = spawn.exec('steam "steam://rungameid/'+game.appid+'"', function(err, out, stderr){
+                spawn.exec('steam "steam://rungameid/'+game.appid+'"', function(err, out, stderr){
 
                 })
               }
