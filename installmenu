@@ -8,10 +8,14 @@ var fs = require('fs')
 var info = require(__dirname +"/config.json");
 var key = info.key;
 var steamid = info.steamid
-var steamdir = info.dir;
+var steamdirs = info.dirs;
 getGames(steamid,key, 0, function(games){
   games = games.response.games;
-  fs.readdir(steamdir+'/steamapps', function(err, files){
+  var files = [];
+  steamdirs.forEach(function(steamdir){
+    var temps = fs.readdirSync(steamdir+'/steamapps');
+    files = files.concat(temps);
+  });
     var ids = []
     files.forEach(function(file){
       if(file.substr(file.length - 3) == 'acf'){
@@ -85,5 +89,4 @@ getGames(steamid,key, 0, function(games){
     })
     sem.leave()
     })
-  });
 });
