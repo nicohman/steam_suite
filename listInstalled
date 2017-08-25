@@ -1,2 +1,0 @@
-#!/bin/bash
-ls ~/.local/share/Steam/steamapps/ | grep .acf | tr -d 'appmanifest_c.'
