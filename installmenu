@@ -8,10 +8,18 @@ var fs = require('fs')
 var info = require(__dirname +"/config.json");
 var key = info.key;
 var steamid = info.steamid
+var steamdir = info.dir;
 getGames(steamid,key, 0, function(games){
   games = games.response.games;
-  spawn.exec('bash ./listInstalled', function(err, out, stderr){
-    var ids = out.split("\n");
+  fs.readdir(steamdir+'/steamapps', function(err, files){
+    var ids = []
+    files.forEach(function(file){
+      if(file.substr(file.length - 3) == 'acf'){
+      file =file.replace("appmanifest_" ,"")
+      file = file.replace(".acf", "");
+      ids.push(file);
+    }
+    })
     sem.take(function(){
       var i = 0;
       var num = games.length

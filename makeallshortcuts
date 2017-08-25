@@ -1,10 +1,72 @@
-#!/bin/bash
+#!/usr/bin/env node
+var http = require('http');
+var spawn = require('child_process');
+var info = require(__dirname+'/config.json');
+var fs = require('fs');
+var key = info.key;
+var steamid = info.steamid
+var steamdir = info.dir
+var getGames = require(__dirname+'/getGames');
+var sem = require('semaphore')(1);
+function searchGames(rawname, games, callback){
+				fs.readdir(steamdir+'/steamapps/', function(err, files){
+					files.forEach(function(file){
+						if(file.substr(file.length - 3) == 'acf'){
+							sem.take(function(){
+								fs.readFile(steamdir+'/steamapps/'+file, 'utf8',function(err, data){
+									sem.leave()
+									if(err){
+										console.log(err);
+									} else {
+										var pos1 =data.search("installdir") + 14;
+										var pos2 = data.search("LastUpdated") - 4;
+										var outname = data.slice(pos1, pos2)
+										var pos3 = data.search("appid") + 9;
+										var pos4 = data.search("Universe") - 4;
+										var appid = data.slice(pos3, pos4);
+										var pos5 = data.search("name") + 8;
+										var pos6 = data.search("StateFlags") - 4;
+										var name = data.slice(pos5, pos6)
+										if(outname === rawname){
+											callback(appid, name, outname)
+										}
+									}
+								})
+							})
 
-IFS='
-'
-array=( `ls  --format=single-column ~/.local/share/Steam/steamapps/common | tr -d /` )
-cd ~/steam_suite
-for element in "${array[@]}"
-do
-    bash ./createsteamshortcut $element $1
-done
+						}
+					})
+				})
+}
+args = process.argv;
+args.splice(3, args.length -1)
+args.splice(0, 2)
+var dir = args[0]
+fs.readdir(steamdir+'/steamapps/common/', function(err, files){
+	getGames(steamid, key,  1, function(games){
+	files.forEach(function(file){
+		searchGames(file, games, function(id, name, out){
+			var procname = name.toLowerCase().replace(/: /g, "_").replace("-", "_").replace(/ /g, "_").replace(",", "").replace("™", "");
+			fs.mkdir(dir+"/"+procname, function(err){
+				if(err){
+					if(err.code == 'EEXIST'){
+						console.log('A shortcut has already been made for '+ name);
+					} else {
+						console.log(err)
+					}
+				} else {
+					process.stdout.write('Making a shortcut for '+ name + '...')
+					fs.open(dir+"/"+procname+"/start", "w", '700', function(err, fd){
+						if(err) throw err;
+						var data = "#!/bin/bash\nsteam 'steam://rungameid/"+id +"'"
+						fs.writeFile(fd, data, function(err){
+							if(err) throw err;
+							console.log('done!')
+						})
+					})
+				}
+			})
+		})
+	})
+})
+});

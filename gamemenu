@@ -1,5 +1,4 @@
 #!/bin/bash
-~/scripts/gamelist > /tmp/gamelist
-res=$(rofi -p "> " -dmenu < /tmp/gamelist)
+res=$(ls  --format=single-column ~/Games | tr -d / | rofi -p "> " -dmenu )
 cd ~/Games/$res
 ./start
