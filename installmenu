@@ -72,11 +72,12 @@ getGames(steamid,key, 0, function(games){
         toAdd =  toAdd.toLowerCase().replace(/: /g, "_").replace("-", "_").replace(/ /g, "_").replace(",", "").replace("™", "");
         names += toAdd;
       }
+    })
       fs.open('/tmp/installlist', 'w', function(err, fd){
         fs.writeFile(fd, names, function(err){
           spawn.exec('rofi -p "> " -dmenu < /tmp/installlist', function(err, out, stderr){
             games.forEach(function(game){
-              if(game.name == out.trim() ){
+              if(game.name.toLowerCase().replace(/: /g, "_").replace("-", "_").replace(/ /g, "_").replace(",", "").replace("™", "") == out.trim() ){
                 console.log("Picked "+game.name);
                 spawn.exec('steam "steam://rungameid/'+game.appid+'"', function(err, out, stderr){
 
@@ -86,7 +87,6 @@ getGames(steamid,key, 0, function(games){
           })
         })
       })
-    })
     sem.leave()
     })
 });
