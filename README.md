@@ -1,3 +1,5 @@
+# Deprecated
+This is now deprecated, and my other project [eidolon](https://github.com/nicohman/eidolon) should be used instead. It's a hell of a lot more convenient, seriously.
 # steam_suite
 Set of tools/libraries to make integrating steam, DRM-free games and the concept of basic taste easier.
 # Dependencies
